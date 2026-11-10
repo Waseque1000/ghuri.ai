@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { onAuthStateChanged, signOut, User as FirebaseUser } from "firebase/auth";
+import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
 interface NavbarProps {
@@ -31,15 +31,6 @@ export default function Navbar({ activeTab }: NavbarProps) {
     return () => unsubscribe();
   }, []);
 
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-      setMobileMenuOpen(false);
-    } catch {
-      // ignore signout error
-    }
-  };
-
   const navLinks = [
     { name: "Destinations", href: "/#discover", icon: "explore" },
     { name: "Hotels", href: "/hotels", icon: "hotel" },
@@ -52,6 +43,7 @@ export default function Navbar({ activeTab }: NavbarProps) {
     if (activeTab && activeTab.toLowerCase() === name.toLowerCase()) return true;
     if (href === "/hotels" && pathname === "/hotels") return true;
     if (href === "/transport" && pathname === "/transport") return true;
+    if (href === "/dashboard" && pathname === "/dashboard") return true;
     return false;
   };
 
@@ -110,25 +102,31 @@ export default function Navbar({ activeTab }: NavbarProps) {
             })}
           </nav>
 
-          {/* Right Action (Plan Trip routes to Login / Register) */}
+          {/* Right Action (User + Dashboard + Plan Trip) */}
           <div className="flex items-center gap-2 sm:gap-2.5">
             {currentUser && (
-              <div className="hidden sm:flex items-center gap-2">
-                <div className="flex items-center gap-1.5 bg-[#EFF4FF] border border-[#DEE9FC] px-3 py-1.5 rounded-full">
-                  <span className="w-2 h-2 rounded-full bg-[#005F29]" />
-                  <span className="text-xs font-bold text-[#121C2A] max-w-[130px] truncate">
-                    {currentUser.displayName || currentUser.email?.split("@")[0] || "Traveler"}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="px-3 py-1.5 rounded-full text-xs font-bold text-gray-600 hover:text-red-600 hover:bg-red-50 border border-gray-200 transition-colors cursor-pointer"
-                >
-                  Sign Out
-                </button>
-              </div>
+              <Link
+                href="/dashboard"
+                className="hidden sm:flex items-center gap-1.5 bg-[#EFF4FF] hover:bg-[#DEE9FC] border border-[#DEE9FC] px-3 py-1.5 rounded-full transition-colors"
+              >
+                <span className="w-2 h-2 rounded-full bg-[#005F29]" />
+                <span className="text-xs font-bold text-[#121C2A] max-w-[130px] truncate">
+                  {currentUser.displayName || currentUser.email?.split("@")[0] || "Traveler"}
+                </span>
+              </Link>
             )}
+
+            <Link
+              href="/dashboard"
+              className={`hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                pathname === "/dashboard"
+                  ? "bg-[#9CF2E8] text-[#00201D] border-[#005C55]"
+                  : "bg-white text-[#005C55] hover:bg-[#EFF4FF] border-[#005C55]/30"
+              }`}
+            >
+              <span className="material-symbols-outlined text-sm">dashboard</span>
+              <span>Dashboard</span>
+            </Link>
 
             <Link
               href="/login"
@@ -181,22 +179,25 @@ export default function Navbar({ activeTab }: NavbarProps) {
               );
             })}
 
-            {/* Mobile Plan Trip Action */}
+            {/* Mobile Dashboard & Plan Trip Actions */}
             <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
               {currentUser && (
-                <div className="flex items-center justify-between bg-[#EFF4FF] p-3 rounded-xl">
+                <div className="flex items-center gap-2 bg-[#EFF4FF] p-3 rounded-xl">
+                  <span className="w-2 h-2 rounded-full bg-[#005F29] shrink-0" />
                   <div className="text-xs font-bold text-[#121C2A] truncate">
-                    Signed in as {currentUser.displayName || currentUser.email}
+                    {currentUser.displayName || currentUser.email}
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleSignOut}
-                    className="px-3 py-1 rounded-lg bg-white text-red-600 text-xs font-bold border border-red-200 cursor-pointer"
-                  >
-                    Sign Out
-                  </button>
                 </div>
               )}
+
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full bg-[#EFF4FF] hover:bg-[#DEE9FC] text-[#005C55] border border-[#005C55]/30 py-2.5 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-sm">dashboard</span>
+                <span>Tour Plan Dashboard</span>
+              </Link>
 
               <Link
                 href="/login"

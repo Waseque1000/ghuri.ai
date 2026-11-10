@@ -3,13 +3,13 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDsAywD7m8F6SqmIvKN8XxGDkw8x2RLn5s",
-  authDomain: "ghuri-c35d2.firebaseapp.com",
-  projectId: "ghuri-c35d2",
-  storageBucket: "ghuri-c35d2.firebasestorage.app",
-  messagingSenderId: "754471579740",
-  appId: "1:754471579740:web:6a15c3cb197bf8f607f699",
-  measurementId: "G-20ZJB94DMY"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase (prevent re-initialization in Next.js hot reload / SSR)
@@ -32,4 +32,3 @@ if (typeof window !== "undefined") {
 }
 
 export { app, auth, googleProvider, analytics };
-

@@ -60,7 +60,7 @@ export default function LoginPage() {
 
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
-      router.push("/");
+      router.push("/dashboard");
     } catch (err: unknown) {
       const firebaseErr = err as { code?: string; message?: string };
       setError(getFriendlyAuthError(firebaseErr.code, firebaseErr.message));
@@ -76,7 +76,7 @@ export default function LoginPage() {
 
     try {
       await signInWithPopup(auth, googleProvider);
-      router.push("/");
+      router.push("/dashboard");
     } catch (err: unknown) {
       const firebaseErr = err as { code?: string; message?: string };
       setError(getFriendlyAuthError(firebaseErr.code, firebaseErr.message));

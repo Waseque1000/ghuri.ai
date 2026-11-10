@@ -41,12 +41,15 @@ export default function HomePage() {
     SAMPLE_TRANSPORTS[3]
   );
 
-  // Load any selection made on /hotels or /transport from localStorage
+  // Load any selection made on /hotels, /transport, or /dashboard from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem("ghuri_trip_state");
       if (saved) {
         const parsed = JSON.parse(saved);
+        if (parsed.destination) setDestination(parsed.destination);
+        if (parsed.checkInDate) setCheckInDate(parsed.checkInDate);
+        if (parsed.travelStyle) setTravelStyle(parsed.travelStyle);
         if (parsed.travelers) setTravelersState(parsed.travelers);
         if (parsed.nights) setNights(parsed.nights);
         if (parsed.roomCategory) setRoomCategoryState(parsed.roomCategory);
@@ -87,6 +90,9 @@ export default function HomePage() {
         "ghuri_trip_state",
         JSON.stringify({
           ...existing,
+          destination,
+          checkInDate,
+          travelStyle,
           travelers,
           nights,
           roomCategory,
@@ -169,7 +175,10 @@ export default function HomePage() {
         {/* Stitch-style Hero with Fully Clickable & Interactive Quick Search */}
         <HeroSection
           destination={destination}
-          setDestination={setDestination}
+          setDestination={(d) => {
+            setDestination(d);
+            syncToStorage({ destination: d });
+          }}
           travelers={travelers}
           setTravelers={handleSetTravelers}
           nights={nights}
@@ -178,7 +187,10 @@ export default function HomePage() {
             syncToStorage({ nights: n });
           }}
           checkInDate={checkInDate}
-          setCheckInDate={setCheckInDate}
+          setCheckInDate={(dt) => {
+            setCheckInDate(dt);
+            syncToStorage({ checkInDate: dt });
+          }}
           roomCategory={roomCategory}
           setRoomCategory={handleSelectRoomCategory}
           roomsCount={roomsCount}
@@ -187,7 +199,10 @@ export default function HomePage() {
             syncToStorage({ roomsCount: r });
           }}
           travelStyle={travelStyle}
-          setTravelStyle={setTravelStyle}
+          setTravelStyle={(s) => {
+            setTravelStyle(s);
+            syncToStorage({ travelStyle: s });
+          }}
         />
 
         {/* Destination Discovery Section with Trust Pillars */}

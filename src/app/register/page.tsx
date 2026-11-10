@@ -78,7 +78,7 @@ export default function RegisterPage() {
           displayName: fullName.trim()
         });
       }
-      router.push("/");
+      router.push("/dashboard");
     } catch (err: unknown) {
       const firebaseErr = err as { code?: string; message?: string };
       setError(getFriendlyRegisterError(firebaseErr.code, firebaseErr.message));
@@ -93,7 +93,7 @@ export default function RegisterPage() {
 
     try {
       await signInWithPopup(auth, googleProvider);
-      router.push("/");
+      router.push("/dashboard");
     } catch (err: unknown) {
       const firebaseErr = err as { code?: string; message?: string };
       setError(getFriendlyRegisterError(firebaseErr.code, firebaseErr.message));
