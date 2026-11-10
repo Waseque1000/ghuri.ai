@@ -4,16 +4,18 @@ import { useState } from "react";
 import Link from "next/link";
 import { calculateTripBudget } from "@/lib/calculations";
 import {
+  ADVANCED_HOTEL_INVENTORY,
   AdvancedHotel,
   RoomOption,
   ROOM_CATEGORIES,
   RoomCategoryType
 } from "@/lib/hotelData";
-import { TransportOption } from "@/lib/data";
+import { SAMPLE_TRANSPORTS, TransportOption } from "@/lib/data";
+import PrintableTripSheet from "@/components/PrintableTripSheet";
 import {
   Sparkles,
   CheckCircle,
-  Download,
+  Printer,
   Hotel as HotelIcon,
   Bus as BusIcon
 } from "lucide-react";
@@ -207,10 +209,13 @@ export default function PlannerAndBudget({
   };
 
   const itineraryDays = generateItineraryDays();
+  const activeHotel = selectedHotel || ADVANCED_HOTEL_INVENTORY[5];
+  const activeRoom = selectedRoom || activeHotel.rooms[0];
+  const activeTransport = selectedTransport || SAMPLE_TRANSPORTS[3];
 
   return (
-    <section id="planner" className="py-12 sm:py-16 bg-[#F8F9FF]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+    <section id="planner" className="py-12 sm:py-16 bg-[#F8F9FF] print:py-0 print:bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 no-print">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#9CF2E8]/40 text-[#005C55] text-xs font-bold uppercase tracking-wider mb-2">
@@ -670,19 +675,21 @@ export default function PlannerAndBudget({
                 )}
 
                 {/* CTA actions */}
-                <div className="pt-2 flex items-center gap-3">
+                <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
                   <Link
                     href="/login"
-                    className="flex-1 py-3 rounded-xl bg-[#005C55] hover:bg-[#0F766E] text-white font-bold text-xs shadow-md transition-all text-center cursor-pointer"
+                    className="flex-1 py-3 px-4 rounded-xl bg-[#005C55] hover:bg-[#0F766E] text-white font-bold text-xs shadow-md transition-all text-center cursor-pointer flex items-center justify-center"
                   >
                     Save & Export Trip Plan
                   </Link>
                   <button
+                    type="button"
                     onClick={() => window.print()}
-                    className="p-3 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 cursor-pointer"
-                    title="Export as PDF"
+                    className="py-3 px-4 rounded-xl bg-[#EFF4FF] hover:bg-[#DEE9FC] border border-[#005C55]/30 text-[#005C55] font-extrabold text-xs cursor-pointer flex items-center justify-center gap-1.5 transition-all"
+                    title="Print Official A4 Tour Plan & Budget Sheet"
                   >
-                    <Download className="w-4 h-4" />
+                    <Printer className="w-4 h-4" />
+                    <span>Print Tour Plan</span>
                   </button>
                 </div>
               </div>
@@ -690,6 +697,34 @@ export default function PlannerAndBudget({
           </div>
         </div>
       </div>
+
+      {/* Dedicated A4 Official Printable Tour Plan Sheet */}
+      <PrintableTripSheet
+        destination={destination}
+        nights={nights}
+        travelers={travelers}
+        roomsCount={roomsNeeded}
+        travelStyle={travelStyle}
+        selectedHotel={activeHotel}
+        selectedRoom={activeRoom}
+        selectedMealPlan={selectedMealPlan}
+        selectedTransport={activeTransport}
+        isRoundTrip={isRoundTrip}
+        contingencyPercent={contingencyPercent}
+        budget={budget}
+        daysSchedule={itineraryDays.map((d) => ({
+          day: d.day,
+          title: d.title,
+          subtitle: d.tag,
+          items: d.items.map((line) => {
+            const [timePart, ...rest] = line.split(": ");
+            return {
+              time: timePart,
+              title: rest.join(": ")
+            };
+          })
+        }))}
+      />
     </section>
   );
 }

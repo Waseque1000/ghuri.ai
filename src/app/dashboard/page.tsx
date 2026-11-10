@@ -6,6 +6,7 @@ import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PrintableTripSheet from "@/components/PrintableTripSheet";
 import {
   ADVANCED_HOTEL_INVENTORY,
   AdvancedHotel,
@@ -363,10 +364,10 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FF]">
+    <div className="min-h-screen print:min-h-0 flex flex-col bg-[#F8F9FF] print:bg-white">
       <Navbar activeTab="Dashboard" />
 
-      <main className="flex-1 pt-20 pb-16">
+      <main className="flex-1 pt-20 pb-16 no-print">
         {/* Top Hero Banner */}
         <section className="bg-gradient-to-br from-[#005C55] via-[#0B6B63] to-[#003E39] text-white py-8 sm:py-12 px-4 sm:px-6 lg:px-12">
           <div className="max-w-7xl mx-auto">
@@ -1077,6 +1078,39 @@ export default function DashboardPage() {
           </section>
         </div>
       </main>
+
+      {/* Dedicated A4 Official Printable Tour Plan Sheet */}
+      <PrintableTripSheet
+        travelerName={
+          currentUser?.displayName ||
+          currentUser?.email?.split("@")[0] ||
+          "Valued Traveler"
+        }
+        destination={destination}
+        checkInDate={checkInDate}
+        nights={nights}
+        travelers={travelers}
+        roomsCount={effectiveRooms}
+        travelStyle={travelStyle}
+        selectedHotel={selectedHotel}
+        selectedRoom={selectedRoom}
+        selectedMealPlan={selectedMealPlan}
+        selectedTransport={selectedTransport}
+        isRoundTrip={isRoundTrip}
+        contingencyPercent={contingencyPercent}
+        budget={budget}
+        daysSchedule={dailyItinerary.map((d) => ({
+          day: d.day,
+          title: d.title,
+          subtitle: d.subtitle,
+          items: d.steps.map((s) => ({
+            time: s.time,
+            phase: s.phase,
+            title: s.title,
+            detail: s.detail
+          }))
+        }))}
+      />
 
       <Footer />
     </div>

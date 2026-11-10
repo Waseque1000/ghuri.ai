@@ -166,68 +166,70 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FF]">
+    <div className="min-h-screen print:min-h-0 flex flex-col bg-[#F8F9FF] print:bg-white">
       {/* Navigation Header */}
       <Navbar />
 
       {/* Main Content Sections */}
       <main className="flex-1">
-        {/* Stitch-style Hero with Fully Clickable & Interactive Quick Search */}
-        <HeroSection
-          destination={destination}
-          setDestination={(d) => {
-            setDestination(d);
-            syncToStorage({ destination: d });
-          }}
-          travelers={travelers}
-          setTravelers={handleSetTravelers}
-          nights={nights}
-          setNights={(n) => {
-            setNights(n);
-            syncToStorage({ nights: n });
-          }}
-          checkInDate={checkInDate}
-          setCheckInDate={(dt) => {
-            setCheckInDate(dt);
-            syncToStorage({ checkInDate: dt });
-          }}
-          roomCategory={roomCategory}
-          setRoomCategory={handleSelectRoomCategory}
-          roomsCount={roomsCount}
-          setRoomsCount={(r) => {
-            setRoomsCount(r);
-            syncToStorage({ roomsCount: r });
-          }}
-          travelStyle={travelStyle}
-          setTravelStyle={(s) => {
-            setTravelStyle(s);
-            syncToStorage({ travelStyle: s });
-          }}
-        />
+        <div className="no-print">
+          {/* Stitch-style Hero with Fully Clickable & Interactive Quick Search */}
+          <HeroSection
+            destination={destination}
+            setDestination={(d) => {
+              setDestination(d);
+              syncToStorage({ destination: d });
+            }}
+            travelers={travelers}
+            setTravelers={handleSetTravelers}
+            nights={nights}
+            setNights={(n) => {
+              setNights(n);
+              syncToStorage({ nights: n });
+            }}
+            checkInDate={checkInDate}
+            setCheckInDate={(dt) => {
+              setCheckInDate(dt);
+              syncToStorage({ checkInDate: dt });
+            }}
+            roomCategory={roomCategory}
+            setRoomCategory={handleSelectRoomCategory}
+            roomsCount={roomsCount}
+            setRoomsCount={(r) => {
+              setRoomsCount(r);
+              syncToStorage({ roomsCount: r });
+            }}
+            travelStyle={travelStyle}
+            setTravelStyle={(s) => {
+              setTravelStyle(s);
+              syncToStorage({ travelStyle: s });
+            }}
+          />
 
-        {/* Destination Discovery Section with Trust Pillars */}
-        <DestinationDiscovery />
+          {/* Destination Discovery Section with Trust Pillars */}
+          <DestinationDiscovery />
 
-        {/* Featured Hotel Finder Preview on Home Page (Full catalog at /hotels) */}
-        <HotelFinder
-          onSelectHotelAndRoom={handleSelectHotelAndRoom}
-          selectedHotelId={selectedHotel?.id}
-          selectedRoomId={selectedRoom?.id}
-          preferredCategory={roomCategory}
-          onChangePreferredCategory={handleSelectRoomCategory}
-          nights={nights}
-          travelers={travelers}
-          customRoomsCount={roomsCount}
-          maxItems={4}
-        />
+          {/* Featured Hotel Finder Preview on Home Page (Full catalog at /hotels) */}
+          <HotelFinder
+            onSelectHotelAndRoom={handleSelectHotelAndRoom}
+            selectedHotelId={selectedHotel?.id}
+            selectedRoomId={selectedRoom?.id}
+            preferredCategory={roomCategory}
+            onChangePreferredCategory={handleSelectRoomCategory}
+            nights={nights}
+            travelers={travelers}
+            customRoomsCount={roomsCount}
+            maxItems={4}
+          />
 
-        {/* Featured Transport Comparison Preview on Home Page (Full catalog at /transport) */}
-        <TransportComparison
-          onSelectTransport={handleSelectTransport}
-          selectedTransportId={selectedTransport?.id}
-          travelers={travelers}
-          maxItems={4}
-        />
+          {/* Featured Transport Comparison Preview on Home Page (Full catalog at /transport) */}
+          <TransportComparison
+            onSelectTransport={handleSelectTransport}
+            selectedTransportId={selectedTransport?.id}
+            travelers={travelers}
+            maxItems={4}
+          />
+        </div>
 
         {/* AI Itinerary Timeline & Live Connected Budget Calculator */}
         <PlannerAndBudget
