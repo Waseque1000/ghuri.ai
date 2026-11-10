@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { POPULAR_DESTINATIONS } from "@/lib/data";
 
 export default function DestinationDiscovery() {
@@ -229,13 +230,13 @@ export default function DestinationDiscovery() {
                       <span className="material-symbols-outlined text-[#005C55] text-base">directions_bus</span>
                       <span className="font-medium">Direct AC Transport</span>
                     </div>
-                    <a
-                      href="#planner"
+                    <Link
+                      href="/login"
                       className="bg-[#005C55] text-white hover:bg-[#0F766E] px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1"
                     >
                       <span>Plan Trip</span>
                       <span className="material-symbols-outlined text-sm">arrow_outward</span>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>

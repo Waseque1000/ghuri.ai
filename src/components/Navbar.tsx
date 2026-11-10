@@ -2,14 +2,19 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { onAuthStateChanged, signOut, User as FirebaseUser } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 interface NavbarProps {
   activeTab?: string;
 }
 
 export default function Navbar({ activeTab }: NavbarProps) {
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,13 +24,36 @@ export default function Navbar({ activeTab }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      setMobileMenuOpen(false);
+    } catch {
+      // ignore signout error
+    }
+  };
+
   const navLinks = [
-    { name: "Destinations", href: "#discover", icon: "explore" },
-    { name: "Hotels", href: "#hotels", icon: "hotel" },
-    { name: "Transport", href: "#transport", icon: "directions_bus" },
-    { name: "Trip Planner", href: "#planner", icon: "auto_awesome" },
-    { name: "Budget Engine", href: "#budget", icon: "calculate" },
+    { name: "Destinations", href: "/#discover", icon: "explore" },
+    { name: "Hotels", href: "/hotels", icon: "hotel" },
+    { name: "Transport", href: "/transport", icon: "directions_bus" },
+    { name: "Trip Planner", href: "/#planner", icon: "auto_awesome" },
+    { name: "Budget Engine", href: "/#budget", icon: "calculate" }
   ];
+
+  const isLinkActive = (href: string, name: string) => {
+    if (activeTab && activeTab.toLowerCase() === name.toLowerCase()) return true;
+    if (href === "/hotels" && pathname === "/hotels") return true;
+    if (href === "/transport" && pathname === "/transport") return true;
+    return false;
+  };
 
   return (
     <>
@@ -36,17 +64,20 @@ export default function Navbar({ activeTab }: NavbarProps) {
             : "bg-white/90 backdrop-blur-sm border-b border-gray-100/60"
         }`}
       >
-        <div className="h-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-4">
+        <div className="h-16 max-w-7xl mx-auto px-3 sm:px-6 lg:px-12 flex items-center justify-between gap-2 sm:gap-4">
           {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#005C55] to-[#0F766E] flex items-center justify-center text-white shadow-sm shadow-[#005C55]/25 transition-transform group-hover:scale-105">
-              <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-[#005C55] to-[#0F766E] flex items-center justify-center text-white shadow-sm shadow-[#005C55]/25 transition-transform group-hover:scale-105">
+              <span
+                className="material-symbols-outlined text-lg sm:text-xl"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
                 explore
               </span>
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5 leading-none">
-                <span className="font-extrabold text-xl tracking-tight text-[#121C2A]">
+                <span className="font-extrabold text-lg sm:text-xl tracking-tight text-[#121C2A]">
                   Ghuri<span className="text-[#005C55]">.ai</span>
                 </span>
                 <span className="text-[10px] font-bold text-[#005C55] bg-[#9CF2E8]/40 px-1.5 py-0.5 rounded-full uppercase tracking-wider hidden sm:inline-block">
@@ -61,26 +92,53 @@ export default function Navbar({ activeTab }: NavbarProps) {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1 bg-gray-50/80 border border-gray-100 px-2 py-1 rounded-full">
-            {navLinks.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-gray-600 hover:text-[#005C55] hover:bg-white transition-all hover:shadow-xs"
-              >
-                {item.name}
-              </a>
-            ))}
+            {navLinks.map((item) => {
+              const active = isLinkActive(item.href, item.name);
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                    active
+                      ? "bg-[#005C55] text-white shadow-xs font-bold"
+                      : "text-gray-600 hover:text-[#005C55] hover:bg-white hover:shadow-xs"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Right Action */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <a
-              href="#planner"
+          {/* Right Action (Plan Trip routes to Login / Register) */}
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            {currentUser && (
+              <div className="hidden sm:flex items-center gap-2">
+                <div className="flex items-center gap-1.5 bg-[#EFF4FF] border border-[#DEE9FC] px-3 py-1.5 rounded-full">
+                  <span className="w-2 h-2 rounded-full bg-[#005F29]" />
+                  <span className="text-xs font-bold text-[#121C2A] max-w-[130px] truncate">
+                    {currentUser.displayName || currentUser.email?.split("@")[0] || "Traveler"}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="px-3 py-1.5 rounded-full text-xs font-bold text-gray-600 hover:text-red-600 hover:bg-red-50 border border-gray-200 transition-colors cursor-pointer"
+                >
+                  Sign Out
+                </button>
+              </div>
+            )}
+
+            <Link
+              href="/login"
               className="bg-[#005C55] hover:bg-[#0F766E] text-white px-3.5 sm:px-4 py-2 rounded-full text-xs font-bold transition-all shadow-sm hover:shadow flex items-center gap-1.5 shrink-0"
             >
               <span>Plan Trip</span>
-              <span className="material-symbols-outlined text-sm hidden sm:inline-block">arrow_forward</span>
-            </a>
+              <span className="material-symbols-outlined text-sm hidden sm:inline-block">
+                arrow_forward
+              </span>
+            </Link>
 
             {/* Mobile Hamburger Toggle */}
             <button
@@ -97,33 +155,57 @@ export default function Navbar({ activeTab }: NavbarProps) {
 
         {/* Mobile Slide-down Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-white/98 backdrop-blur-xl border-b border-gray-200 shadow-xl px-5 py-4 space-y-1.5 animate-in slide-in-from-top-2 duration-200">
-            {navLinks.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-gray-800 hover:text-[#005C55] hover:bg-[#EFF4FF] transition-colors"
-              >
-                <span className="material-symbols-outlined text-lg text-[#005C55]">{item.icon}</span>
-                <span>{item.name}</span>
-              </a>
-            ))}
+          <div className="lg:hidden max-h-[calc(100vh-4rem)] overflow-y-auto bg-white/98 backdrop-blur-xl border-b border-gray-200 shadow-xl px-4 sm:px-5 py-4 space-y-1.5 animate-in slide-in-from-top-2 duration-200">
+            {navLinks.map((item) => {
+              const active = isLinkActive(item.href, item.name);
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                    active
+                      ? "bg-[#005C55] text-white"
+                      : "text-gray-800 hover:text-[#005C55] hover:bg-[#EFF4FF]"
+                  }`}
+                >
+                  <span
+                    className={`material-symbols-outlined text-lg ${
+                      active ? "text-white" : "text-[#005C55]"
+                    }`}
+                  >
+                    {item.icon}
+                  </span>
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
 
+            {/* Mobile Plan Trip Action */}
             <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
-              <a
-                href="#planner"
+              {currentUser && (
+                <div className="flex items-center justify-between bg-[#EFF4FF] p-3 rounded-xl">
+                  <div className="text-xs font-bold text-[#121C2A] truncate">
+                    Signed in as {currentUser.displayName || currentUser.email}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="px-3 py-1 rounded-lg bg-white text-red-600 text-xs font-bold border border-red-200 cursor-pointer"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+
+              <Link
+                href="/login"
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full bg-[#005C55] hover:bg-[#0F766E] text-white py-2.5 rounded-xl text-xs font-bold transition-all text-center shadow-sm flex items-center justify-center gap-1.5"
               >
-                <span>Start Planning Your Trip</span>
-                <span className="material-symbols-outlined text-sm">auto_awesome</span>
-              </a>
-              <div className="text-center py-1">
-                <span className="text-[11px] font-semibold text-gray-400">
-                  🇧🇩 Verified Published Tariffs • Zero Markups
-                </span>
-              </div>
+                <span>Plan Trip</span>
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </Link>
             </div>
           </div>
         )}

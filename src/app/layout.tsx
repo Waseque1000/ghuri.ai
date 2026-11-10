@@ -21,14 +21,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${plusJakartaSans.variable} h-full scroll-smooth light`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${plusJakartaSans.variable} h-full scroll-smooth light`}
+    >
       <head>
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#F8F9FF] text-[#121C2A] antialiased selection:bg-[#005C55]/20 selection:text-[#005C55] font-sans">
+      <body
+        suppressHydrationWarning
+        className="min-h-full flex flex-col bg-[#F8F9FF] text-[#121C2A] antialiased selection:bg-[#005C55]/20 selection:text-[#005C55] font-sans"
+      >
         {children}
       </body>
     </html>

@@ -39,10 +39,10 @@ export default function Footer() {
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Platform</h4>
             <ul className="space-y-2 text-xs text-gray-300">
-              <li><a href="#hotels" className="hover:text-white transition-colors">Hotel Tariff Inspector</a></li>
-              <li><a href="#transport" className="hover:text-white transition-colors">Shohoz & Railway Schedules</a></li>
-              <li><a href="#planner" className="hover:text-white transition-colors">AI Itinerary Generator</a></li>
-              <li><a href="#budget" className="hover:text-white transition-colors">Deterministic Group Split</a></li>
+              <li><Link href="/hotels" className="hover:text-white transition-colors">All Verified Hotels (/hotels)</Link></li>
+              <li><Link href="/transport" className="hover:text-white transition-colors">Transport Directory (/transport)</Link></li>
+              <li><Link href="/#planner" className="hover:text-white transition-colors">AI Itinerary Generator</Link></li>
+              <li><Link href="/#budget" className="hover:text-white transition-colors">Deterministic Group Split</Link></li>
             </ul>
           </div>
 
